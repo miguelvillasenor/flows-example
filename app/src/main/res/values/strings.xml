@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Realtime Streams</string>
+    <string name="search_game">Search Game</string>
 </resources>

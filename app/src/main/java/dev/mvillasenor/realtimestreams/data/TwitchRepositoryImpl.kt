@@ -9,36 +9,32 @@ import timber.log.Timber
 
 class TwitchRepositoryImpl(private val twitchApi: TwitchApi) : TwitchRepository {
 
-    override fun observeTopGames(): Flow<List<Game>> =
-        flow {
-            while (true) {
-                emit(1)
-                delay(20_000)
+    override fun observeTopGames(): Flow<List<Game>> = twentySecondsFlow()
+        .transform {
+            try {
+                Timber.d("Fetching games ...")
+                emit(twitchApi.getTopGames().data)
+            } catch (exception: Exception) {
+                Timber.e(exception, "Error fetching Games")
             }
         }
-            .transform {
-                try {
-                    Timber.d("Fetching games ...")
-                    emit(twitchApi.getTopGames().data)
-                } catch (exception: Exception) {
-                    Timber.e(exception, "Error fetching Games")
-                }
-            }
 
 
-    override fun observeStreamsFor(gameId: String): Flow<List<Stream>> =
-        flow {
-            while (true) {
-                emit(1)
-                delay(20_000)
+    override fun observeStreamsFor(gameId: String): Flow<List<Stream>> = twentySecondsFlow()
+        .transform {
+            try {
+                Timber.d("Fetching streams ...")
+                emit(twitchApi.getStreams(gameId).data)
+            } catch (exception: Exception) {
+                Timber.e(exception, "Error fetching Streams")
             }
         }
-            .transform {
-                try {
-                    Timber.d("Fetching streams ...")
-                    emit(twitchApi.getStreams(gameId).data)
-                } catch (exception: Exception) {
-                    Timber.e(exception, "Error fetching Streams")
-                }
-            }
+
+    private fun twentySecondsFlow() = flow {
+        while (true) {
+            emit(Unit)
+            delay(20_000)
+        }
+    }
+
 }

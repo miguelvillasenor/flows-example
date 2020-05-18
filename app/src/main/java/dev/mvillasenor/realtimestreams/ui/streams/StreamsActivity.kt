@@ -1,6 +1,5 @@
-package dev.mvillasenor.realtimestreams.ui.main
+package dev.mvillasenor.realtimestreams.ui.streams
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import androidx.activity.viewModels
@@ -14,20 +13,23 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.android.AndroidInjection
 import dev.mvillasenor.realtimestreams.R
 import dev.mvillasenor.realtimestreams.databinding.ActivityMainBinding
-import dev.mvillasenor.realtimestreams.ui.main.adapter.GamesAdapter
-import dev.mvillasenor.realtimestreams.ui.streams.StreamsActivity
+import dev.mvillasenor.realtimestreams.ui.streams.adapter.StreamsAdapter
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+class StreamsActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private val mainViewModel by viewModels<MainViewModel> { viewModelFactory }
+    private val mainViewModel by viewModels<StreamsViewModel> { viewModelFactory }
 
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
-    private val adapter = GamesAdapter(::onOpenGame)
+    private val adapter = StreamsAdapter()
+
+    private val gameId by lazy {
+        intent.getStringExtra(ARG_GAME_ID)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 
         setupRecyclerView()
 
-        mainViewModel.gamesLiveData.observe(this) { result ->
+        mainViewModel.getStreamsLiveData(gameId).observe(this) { result ->
             adapter.submitList(result)
         }
     }
@@ -80,9 +82,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onOpenGame(gameId: String) {
-        val intent = Intent(this, StreamsActivity::class.java)
-        intent.putExtra(StreamsActivity.ARG_GAME_ID, gameId)
-        startActivity(intent)
+    companion object {
+        const val ARG_GAME_ID = "game_id"
     }
 }

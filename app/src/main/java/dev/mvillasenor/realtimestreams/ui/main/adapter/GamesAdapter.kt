@@ -8,11 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import dev.mvillasenor.realtimestreams.data.Game
 import dev.mvillasenor.realtimestreams.databinding.GameItemBinding
 import dev.mvillasenor.realtimestreams.ext.loadImage
-import timber.log.Timber
 
-class GamesAdapter : ListAdapter<Game, GamesAdapter.GameViewHolder>(GameDiffCallback()) {
-
-
+class GamesAdapter(
+    private val gameClicked: (String) -> Unit
+) : ListAdapter<Game, GamesAdapter.GameViewHolder>(GameDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GameViewHolder =
         GameViewHolder(
@@ -23,18 +22,19 @@ class GamesAdapter : ListAdapter<Game, GamesAdapter.GameViewHolder>(GameDiffCall
             )
         )
 
-
     override fun onBindViewHolder(holder: GameViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), gameClicked)
     }
-
 
     class GameViewHolder(private val binding: GameItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(game: Game) {
-            binding.cover.loadImage(game.boxArtUrl.replace("{width}x{height}","200x300"))
+        fun bind(game: Game, clickListener: (String) -> Unit) {
+            binding.cover.loadImage(game.boxArtUrl.replace("{width}x{height}", "200x300"))
             binding.title.text = game.name
+            binding.root.setOnClickListener {
+                clickListener(game.id)
+            }
         }
     }
 

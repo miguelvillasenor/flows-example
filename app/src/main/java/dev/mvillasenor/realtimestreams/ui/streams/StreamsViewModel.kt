@@ -1,29 +1,27 @@
-package dev.mvillasenor.realtimestreams.ui.main
+package dev.mvillasenor.realtimestreams.ui.streams
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dev.mvillasenor.realtimestreams.data.TwitchRepository
-import dev.mvillasenor.realtimestreams.data.TwitchRepositoryImpl
-import dev.mvillasenor.realtimestreams.data.retrofit.TwitchApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-class MainViewModel @Inject constructor(
-    twitchRepository: TwitchRepository
+class StreamsViewModel @Inject constructor(
+    private val twitchRepository: TwitchRepository
 ) : ViewModel() {
 
     private val filterChannel = Channel<String>()
 
-    val gamesLiveData = twitchRepository.observeTopGames()
+    fun getStreamsLiveData(gameId: String) = twitchRepository
+        .observeStreamsFor(gameId)
         .combine(filterChannel.receiveAsFlow()) { games, filter ->
             if (filter.isEmpty()) {
                 games
             } else {
-                games
-                    .filter { it.name.contains(filter, true) }
+                games.filter { it.title.contains(filter, true) }
             }
         }
         .asLiveData(viewModelScope.coroutineContext)
@@ -31,5 +29,4 @@ class MainViewModel @Inject constructor(
     fun applyTextFilter(filter: String) {
         filterChannel.offer(filter)
     }
-
 }

@@ -16,6 +16,10 @@ import dev.mvillasenor.realtimestreams.R
 import dev.mvillasenor.realtimestreams.databinding.ActivityMainBinding
 import dev.mvillasenor.realtimestreams.ui.main.adapter.GamesAdapter
 import dev.mvillasenor.realtimestreams.ui.streams.StreamsActivity
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import dev.mvillasenor.realtimestreams.ext.queriesChannel
+import kotlinx.coroutines.channels.consumeEach
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -64,16 +68,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpSearchView(menu: Menu) {
         val searchActionView = menu.findItem(R.id.search).actionView as SearchView
-        searchActionView.setOnQueryTextListener(object :
-            SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
-            override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.let {
-                    mainViewModel.applyTextFilter(it)
-                }
-                return true
+        MainScope().launch {
+            searchActionView.queriesChannel.consumeEach {
+                mainViewModel.applyTextFilter(it)
             }
-        })
+        }
         searchActionView.setOnCloseListener {
             mainViewModel.applyTextFilter("")
             return@setOnCloseListener true

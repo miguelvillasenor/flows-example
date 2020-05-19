@@ -1,7 +1,7 @@
 package dev.mvillasenor.realtimestreams.ext
 
 import android.widget.ImageView
-import android.widget.SearchView
+import androidx.appcompat.widget.SearchView
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.channels.Channel
 

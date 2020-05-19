@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dev.mvillasenor.realtimestreams.data.TwitchRepository
-import dev.mvillasenor.realtimestreams.data.TwitchRepositoryImpl
-import dev.mvillasenor.realtimestreams.data.retrofit.TwitchApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
